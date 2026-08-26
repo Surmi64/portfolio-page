@@ -371,23 +371,14 @@ pointer-events: none`, so they stay focusable and the native radio group still
 works from the keyboard (Tab in, arrow keys to switch). Styling the labels alone
 would have made the switch mouse-only.
 
-Each option is filled with its flag's colours — red/white/blue for EN (shared by
-GB and US), red/white/green for HU — as a 100° sweep across the pill, the same
-shape as the brand gradient it replaced.
+The active option is marked with the site's own brand gradient (cyan → violet)
+and dark text, matching how the rest of the UI marks a selected item.
 
-Hues are the flags'; the **luminance is raised** so the dark label clears AA at
-both ends. The originals do not: `#05070c` measures 3.4:1 on `#c8102e` and 2.2:1
-on `#012169`, and on a near-black UI that navy also reads as black. For scale,
-the brand gradient this replaced ran 11.2:1 (cyan) to 5.1:1 (violet), so the
-lifted flag colours sit in the same register rather than being a compromise.
+> National-colour fills were tried and reverted — see the git history if you are
+> tempted. They work technically (the label sits at 9.7–20:1 once the gradient
+> has blended toward its white middle) but they pull the eye away from
+> everything else on a page whose whole palette is two neon accents.
 
-Measured under the label rather than at the gradient endpoints, which is what
-actually matters: the label spans roughly 28–72% of the pill, where the sweep has
-already blended toward the white middle, so the real contrast is **9.7–20:1**.
-
-The inactive option is dimmed to `opacity: .62`. At `.42` the white band lands on
-`#767679` and its label drops to 4.45:1 — just under AA — while `.62` holds 8.2:1
-and still reads as clearly secondary next to the active pill's white ring.
 
 It also carries `<meta name="robots" content="noindex, nofollow">`, so the real
 site does not come back to a search index full of "under construction".
