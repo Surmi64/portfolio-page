@@ -47,8 +47,11 @@ jobs:
       WEBROOT: /var/istumpf-dev
 
     steps:
+      # Pinned to a commit, not a tag. A tag can be moved to point at new code,
+      # and this runs on a self-hosted machine — a moved tag would execute on the
+      # host that serves the site. `v4` at the time of pinning.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
       - name: Decide what to publish
         id: what
