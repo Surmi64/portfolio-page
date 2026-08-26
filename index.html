@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Imre Stumpf — DevOps Engineer</title>
+<meta name="description" content="DevOps Engineer. I build side projects that solve someone's real problem — an AI tutor grounded in textbooks, a multilingual storefront, a trilingual guesthouse site.">
+<meta name="theme-color" content="#0b0b0f">
+<link rel="canonical" href="https://istumpf.dev/">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://istumpf.dev/">
+<meta property="og:title" content="Imre Stumpf — DevOps Engineer">
+<meta property="og:description" content="DevOps by day, builder by night. Projects that are useful to someone else and teach me something new.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0b0f'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%2322d3ee' stroke-width='2.5'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ============================ background layers ======================= -->
+<div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="grid-overlay" aria-hidden="true"></div>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<div class="noise" aria-hidden="true"></div>
+<div id="cursor-glow" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ================================= nav ================================ -->
+<header class="nav" id="nav">
+  <div class="wrap nav__inner">
+    <a class="brand" href="#top" aria-label="Back to top">
+      <span class="brand__mark"><span id="brand-initials">IS</span></span>
+      <span id="brand-name">istumpf<span style="color:var(--cyan)">.dev</span></span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a class="nav__link" data-nav href="#about">About</a>
+      <a class="nav__link" data-nav href="#work">Work</a>
+      <a class="nav__link" data-nav href="#path">Path</a>
+      <a class="nav__link" data-nav href="#contact">Contact</a>
+    </nav>
+
+    <a class="btn btn--solid nav__cta" href="#contact">
+      Get in touch <span data-icon="arrow-right"></span>
+    </a>
+
+    <button class="nav__burger" id="nav-burger" type="button" aria-label="Menu" aria-expanded="false">
+      <span data-icon="menu"></span>
+    </button>
+  </div>
+</header>
+
+<div class="nav__mobile" id="nav-mobile">
+  <a href="#about">About</a>
+  <a href="#work">Work</a>
+  <a href="#path">Path</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<main class="page" id="top">
+
+  <!-- =============================== hero =============================== -->
+  <section class="section hero">
+    <div class="wrap hero__grid">
+
+      <div class="hero__copy">
+        <div class="hero__badge" data-reveal style="--d:60ms">
+          <span class="pulse"></span>
+          <span id="hero-availability">Open to interesting projects</span>
+        </div>
+
+        <div class="glitch" id="hero-role" data-text="DevOps Engineer" data-reveal style="--d:120ms">DevOps Engineer</div>
+
+        <h1 class="hero__title" id="hero-name" data-reveal style="--d:180ms"></h1>
+
+        <p class="hero__lead" id="hero-lead" data-reveal style="--d:260ms"></p>
+
+        <div class="hero__actions" data-reveal style="--d:340ms">
+          <a class="btn btn--solid" href="#work">
+            See my work <span data-icon="arrow-right"></span>
+          </a>
+          <a class="btn btn--ghost" href="#contact">
+            <span data-icon="send"></span> Contact
+          </a>
+        </div>
+
+        <div class="hero__stats" id="hero-stats"></div>
+      </div>
+
+      <div class="hero__panel" data-reveal="right" style="--d:320ms">
+        <span class="orbit" aria-hidden="true"></span>
+        <div class="glass terminal">
+          <div class="terminal__bar">
+            <span class="terminal__dot"></span>
+            <span class="terminal__dot"></span>
+            <span class="terminal__dot"></span>
+            <span class="terminal__name">stack.json</span>
+          </div>
+          <div class="terminal__body" id="terminal-body"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <span>scroll</span>
+      <i></i>
+    </div>
+  </section>
+
+  <!-- ============================== about =============================== -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <header class="section-head" data-reveal>
+        <div class="eyebrow">01 — About</div>
+        <h2 class="h2">Ops by day, <span class="grad-text">builder by night</span></h2>
+        <p class="section-lead">
+          I keep other people's systems running for a living, which taught me
+          that the interesting problems live at the seams — between the code
+          and the thing it runs on. Side projects are where I get to own both
+          ends, and I choose them by a simple rule: someone other than me has
+          to want the result.
+        </p>
+      </header>
+
+      <div class="principles" id="principles"></div>
+
+      <h3 class="sub-h" data-reveal>What I work with</h3>
+      <div class="skills" id="skills"></div>
+    </div>
+  </section>
+
+  <!-- =============================== work =============================== -->
+  <section class="section" id="work">
+    <div class="wrap">
+      <header class="section-head" data-reveal>
+        <div class="eyebrow">02 — Work</div>
+        <h2 class="h2">Things I've <span class="grad-text">shipped</span></h2>
+        <p class="section-lead">
+          Live products and internal tools. Showing <b id="project-count">0</b>
+          right now — filter by category.
+        </p>
+      </header>
+
+      <div class="filters" id="filters" role="group" aria-label="Filter projects"></div>
+      <div class="projects" id="projects"></div>
+    </div>
+  </section>
+
+  <!-- =============================== path =============================== -->
+  <section class="section" id="path">
+    <div class="wrap">
+      <header class="section-head" data-reveal>
+        <div class="eyebrow">03 — Path</div>
+        <h2 class="h2">How I got <span class="grad-text">here</span></h2>
+      </header>
+
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </section>
+
+  <!-- ============================= contact ============================== -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <header class="section-head" data-reveal>
+        <div class="eyebrow">04 — Contact</div>
+        <h2 class="h2">Let's build <span class="grad-text">something</span></h2>
+        <p class="section-lead">
+          A new product, an AI integration, or an existing system that needs
+          pipelines and monitoring it never got. Write a few lines and I'll
+          get back to you.
+        </p>
+      </header>
+
+      <div class="contact__grid">
+
+        <form class="glass form" id="contact-form" novalidate data-reveal="left">
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input id="f-name" name="name" type="text" placeholder="What should I call you?" autocomplete="name">
+            <div class="field__msg"></div>
+          </div>
+
+          <div class="field">
+            <label for="f-mail">Email</label>
+            <input id="f-mail" name="email" type="email" placeholder="you@example.com" autocomplete="email">
+            <div class="field__msg"></div>
+          </div>
+
+          <div class="field">
+            <label for="f-msg">What's it about?</label>
+            <textarea id="f-msg" name="message" placeholder="A few lines about the project, the timeline and the budget…"></textarea>
+            <div class="field__msg"></div>
+          </div>
+
+          <div class="form__foot">
+            <button class="btn btn--solid" id="f-submit" type="submit">
+              Send message <span data-icon="send"></span>
+            </button>
+            <span class="form__note">No backend yet — submitting validates locally.</span>
+          </div>
+
+          <div class="form__ok" id="form-ok">
+            <span data-icon="check-circle"></span>
+            Thanks — the form validated. Wire your own endpoint into
+            <code>wireForm()</code> in <code>main.js</code>.
+          </div>
+        </form>
+
+        <aside class="aside" data-reveal="right" style="--d:120ms">
+          <div class="glass info" id="info-rows"></div>
+          <div class="glass info">
+            <div class="info__k" style="margin-bottom:14px">Elsewhere</div>
+            <div class="socials" id="socials"></div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== footer ============================== -->
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <span>© <span id="footer-year">2026</span> <span id="footer-name">Imre Stumpf</span></span>
+      <span>Hand-written HTML / CSS / JS · zero dependencies</span>
+    </div>
+  </footer>
+
+</main>
+
+<button class="to-top" id="to-top" type="button" aria-label="Back to top">
+  <span data-icon="arrow-up"></span>
+</button>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
