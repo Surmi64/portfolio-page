@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="IS">
+  <!-- Brand mark from the site: rounded square, cyan -> violet at 135deg,
+       dark "IS" knocked out of it. The letters are paths, not <text>: a favicon
+       is rendered without the page's webfonts, so JetBrains Mono would silently
+       fall back to whatever monospace the platform has. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="32" height="32" rx="10" fill="url(#g)"/>
+
+  <!-- Sized to sit between the site mark's proportions and what survives at
+       16px: cap height 10/32 (the mark is ~9), stroke 2.6 (the mark is lighter).
+       A favicon needs a little more ink than the same glyphs on screen. -->
+  <g fill="none" stroke="#05070c" stroke-width="2.6"
+     stroke-linecap="round" stroke-linejoin="round">
+    <!-- I: stem plus the mono crossbars -->
+    <path d="M10.9 11.2v9.6"/>
+    <path d="M8.8 11.2h4.2"/>
+    <path d="M8.8 20.8h4.2"/>
+    <!-- S -->
+    <path d="M23.9 12.7c0-1.1-1.2-1.6-2.2-1.6-1.2 0-2.5.6-2.5 1.9 0 1.5 1.6 1.9 2.4 2.1 1 .2 2.5.6 2.5 2.3 0 1.6-1.4 2.5-2.6 2.5-1.1 0-2.1-.5-2.4-1.4"/>
+  </g>
+</svg>

@@ -48,6 +48,7 @@ index.html                    the shell: sections and static copy
 assets/css/style.css          all styling (tokens → primitives → sections → responsive)
 assets/js/data.js         ←   EDIT THIS: projects, principles, skills, timeline, contact
 assets/js/icons.js            local inline SVG icon set (27 icons, lucide-style)
+assets/icons/                 favicon set built from the site's own brand mark
 assets/js/main.js             rendering + interactions
 construction/index.html       standalone bilingual holding page (HU / EN)
 deploy/nginx/istumpf.dev.conf  the live public vhost, versioned
@@ -91,7 +92,33 @@ now. Keep that distinction if you edit it.
 </details>
 
 <details>
-<summary><b>Adding an icon</b></summary>
+<summary><b>The favicon</b></summary>
+
+`assets/icons/` reproduces the site's brand mark: rounded square, cyan → violet
+at 135°, dark `IS` knocked out of it.
+
+The letters are **vector paths, not `<text>`**. A favicon is rendered outside
+the page, without its webfonts, so `font-family: "JetBrains Mono"` would
+silently fall back to whatever monospace the platform happens to have — and the
+mark would look different on every OS.
+
+| File | Role |
+|---|---|
+| `icon.svg` | primary — scales to any size, what modern browsers use |
+| `icon-32.png` | fallback, RGBA so the rounded corners stay transparent |
+| `apple-touch-icon.png` | 180×180, **square and opaque** — iOS applies its own mask, so a pre-rounded icon would be rounded twice |
+
+Two things worth keeping if you regenerate them:
+
+- Glyphs are slightly larger and heavier than the on-screen mark (cap height
+  10/32 vs ~9, stroke 2.6). A favicon needs a little more ink to survive 16px.
+- There is deliberately **no 16px PNG**. The one generated here was mushier than
+  the browser's own downscale of the SVG, so shipping it made things worse.
+
+</details>
+
+<details>
+<summary><b>Adding a UI icon</b></summary>
 
 Add the path to the `S` object in `assets/js/icons.js` (24×24 viewBox,
 `stroke-width: 2`), then reference it by name from `data.js`. The set is local
