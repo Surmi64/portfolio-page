@@ -371,15 +371,23 @@ pointer-events: none`, so they stay focusable and the native radio group still
 works from the keyboard (Tab in, arrow keys to switch). Styling the labels alone
 would have made the switch mouse-only.
 
-Each option carries its flag's colours — red/white/blue for EN (shared by GB and
-US), red/white/green for HU — as an **indicator bar under the label**, not as the
-pill fill. A flag gradient cannot carry text: dark type measures 2.5:1 on the red
-and 1.3:1 on the blue, and light type disappears on the white band, so no single
-label colour survives the sweep. As a bar the colours read at full strength while
-the label keeps 15:1 on the glass, and it matches how the site's nav marks its
-active item. The blues are lifted from the official `#012169` / `#3C3B6E`: at 4px
-on a near-black UI the originals render as black, so the hue is kept and the
-luminance raised.
+Each option is filled with its flag's colours — red/white/blue for EN (shared by
+GB and US), red/white/green for HU — as a 100° sweep across the pill, the same
+shape as the brand gradient it replaced.
+
+Hues are the flags'; the **luminance is raised** so the dark label clears AA at
+both ends. The originals do not: `#05070c` measures 3.4:1 on `#c8102e` and 2.2:1
+on `#012169`, and on a near-black UI that navy also reads as black. For scale,
+the brand gradient this replaced ran 11.2:1 (cyan) to 5.1:1 (violet), so the
+lifted flag colours sit in the same register rather than being a compromise.
+
+Measured under the label rather than at the gradient endpoints, which is what
+actually matters: the label spans roughly 28–72% of the pill, where the sweep has
+already blended toward the white middle, so the real contrast is **9.7–20:1**.
+
+The inactive option is dimmed to `opacity: .62`. At `.42` the white band lands on
+`#767679` and its label drops to 4.45:1 — just under AA — while `.62` holds 8.2:1
+and still reads as clearly secondary next to the active pill's white ring.
 
 It also carries `<meta name="robots" content="noindex, nofollow">`, so the real
 site does not come back to a search index full of "under construction".
