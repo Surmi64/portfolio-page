@@ -203,12 +203,36 @@ h1{ font-size:clamp(1.9rem,5.4vw,2.9rem); }
   border:1px solid var(--stroke); border-radius:100px; background:rgba(255,255,255,.03);
 }
 .lang label{
-  padding:5px 13px; border-radius:100px; cursor:pointer;
+  position:relative;
+  padding:5px 14px 10px; border-radius:100px; cursor:pointer;
   font-family:var(--mono); font-size:.72rem; letter-spacing:.08em;
   color:var(--text-3); transition:color .3s, background .3s;
   user-select:none;
 }
 .lang label:hover{ color:var(--text-2); }
+
+/* Flag colours as an indicator bar, not as the pill fill. A red -> white ->
+   blue gradient cannot carry a label: dark text is 2.5:1 on the red and 1.3:1
+   on the blue, and light text vanishes on the white band. As a bar the colours
+   read clearly and the label keeps full contrast on the glass — and the site's
+   nav marks its active item with exactly this kind of underline.
+   The blues are lifted from the official #012169 / #3C3B6E: at 3px on a near
+   black UI the originals read as black. Hue kept, luminance raised. */
+.lang label::after{
+  content:""; position:absolute; left:8px; right:8px; bottom:3px; height:4px;
+  border-radius:4px; opacity:.34;
+  transition:opacity .35s var(--ease), transform .35s var(--ease);
+  transform:scaleX(.72); transform-origin:center;
+}
+.lang label[for="lang-en"]::after{
+  /* GB / US share red-white-blue */
+  background:linear-gradient(90deg,#c8102e 0%,#fff 50%,#23409a 100%);
+}
+.lang label[for="lang-hu"]::after{
+  /* Hungary: red-white-green */
+  background:linear-gradient(90deg,#cd2a3e 0%,#fff 50%,#4e8a5c 100%);
+}
+.lang label:hover::after{ opacity:.6; }
 
 /* default: English visible, Hungarian hidden */
 [lang="hu"].block{ display:none; }
@@ -219,8 +243,13 @@ h1{ font-size:clamp(1.9rem,5.4vw,2.9rem); }
 
 #lang-en:checked ~ .card .lang label[for="lang-en"],
 #lang-hu:checked ~ .card .lang label[for="lang-hu"]{
-  color:#05070c; font-weight:600;
-  background:linear-gradient(100deg,var(--cyan),var(--violet));
+  color:var(--text); font-weight:600;
+  background:rgba(255,255,255,.07);
+}
+#lang-en:checked ~ .card .lang label[for="lang-en"]::after,
+#lang-hu:checked ~ .card .lang label[for="lang-hu"]::after{
+  opacity:1; transform:scaleX(1);
+  box-shadow:0 0 9px -1px rgba(255,255,255,.4);
 }
 #lang-en:focus-visible ~ .card .lang label[for="lang-en"],
 #lang-hu:focus-visible ~ .card .lang label[for="lang-hu"]{
