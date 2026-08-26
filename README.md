@@ -265,6 +265,40 @@ that serves the public copy is versioned here as
 > instead if that is not wanted — see the commented variant in
 > `docker-compose.yml`.
 
+
+### Continuous deploy
+
+`.github/workflows/deploy.yml` runs on a **self-hosted runner on the host that
+serves the site**, so a deploy is a local file copy — there is no SSH key stored
+anywhere for it.
+
+```
+push to main ─► runner (on the web host) ─► rsync into the webroot ─► smoke tests
+```
+
+**What gets published is version-controlled.** `deploy/published` holds a single
+word, `construction` or `site`, and the workflow reads it. Flipping what the
+public sees is therefore a commit you can review, not a hidden setting. A manual
+`workflow_dispatch` can override it for one run.
+
+When it publishes the holding page it also **deletes** the site's `css/js` from
+the webroot, and a later step asserts those paths return 404 — the unfinished
+content should never be fetchable just because a deploy ran.
+
+> [!WARNING]
+> **Public repo + self-hosted runner.** The only triggers are `push` to `main`
+> and manual dispatch. There is deliberately **no `pull_request` trigger** — that
+> is what would let anyone open a PR from a fork and run their code on the
+> runner. Do not add one. Also set *Settings → Actions → General → Fork pull
+> request workflows from outside collaborators* to require approval.
+>
+> The runner runs as an unprivileged user whose primary group is `www-data`, so
+> it can write the webroot with **no sudo at all**. Keep it that way.
+
+Registering the runner needs a token from GitHub, so it is a one-time manual
+step: `sudo deploy/setup-runner.sh <registration-token>` on the web host. The
+script pins the runner version rather than tracking `latest`.
+
 ## Operational notes
 
 Things that cost time to find out. Worth reading before editing the vhost or

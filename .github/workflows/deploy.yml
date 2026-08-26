@@ -1,0 +1,133 @@
+name: Deploy — istumpf.dev
+
+# SECURITY: this is a public repository with a self-hosted runner, so the only
+# triggers are `push` to main and a manual dispatch. There is deliberately no
+# `pull_request` trigger: that is the one that lets anyone open a PR from a fork
+# and run their code on the runner. Do not add it.
+#
+# Also worth setting once, in Settings -> Actions -> General:
+#   "Fork pull request workflows from outside collaborators" -> require approval
+#   for all outside collaborators.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'screenshots/**'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'What to publish (overrides deploy/published)'
+        required: false
+        default: ''
+        type: choice
+        options: ['', 'construction', 'site']
+
+# Least privilege: the job only reads the repo.
+permissions:
+  contents: read
+
+# Never let two deploys interleave mid-copy, but do not cancel one that is
+# already writing files either.
+concurrency:
+  group: deploy-istumpf-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Runs on the host that actually serves the site, so there is no SSH key to
+    # keep anywhere. The runner user owns /var/istumpf-dev; no sudo needed.
+    runs-on: [self-hosted, linux, istumpf-dev]
+
+    # A fork that copies this file cannot reach the runner (it is repo-scoped),
+    # but this makes the intent explicit.
+    if: github.repository == 'Surmi64/portfolio-page'
+
+    env:
+      WEBROOT: /var/istumpf-dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Decide what to publish
+        id: what
+        run: |
+          override='${{ inputs.publish }}'
+          if [ -n "$override" ]; then
+            target="$override"
+            echo "Manual override: $target"
+          else
+            target="$(tr -d '[:space:]' < deploy/published)"
+            echo "From deploy/published: $target"
+          fi
+          case "$target" in
+            construction|site) ;;
+            *) echo "::error::Unknown publish target '$target' (expected 'construction' or 'site')"; exit 1 ;;
+          esac
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+
+      - name: Publish
+        run: |
+          set -euo pipefail
+          target='${{ steps.what.outputs.target }}'
+          mkdir -p "$WEBROOT"
+
+          # The icons are shared by both targets, so they are always synced.
+          mkdir -p "$WEBROOT/assets/icons"
+          rsync -a --delete assets/icons/ "$WEBROOT/assets/icons/"
+
+          if [ "$target" = "site" ]; then
+            rsync -a index.html "$WEBROOT/index.html"
+            rsync -a --delete assets/css assets/js "$WEBROOT/assets/"
+            echo "Published the full site."
+          else
+            rsync -a construction/index.html "$WEBROOT/index.html"
+            # The holding page must not leave the unfinished site fetchable.
+            rm -rf "$WEBROOT/assets/css" "$WEBROOT/assets/js"
+            echo "Published the holding page; site assets removed."
+          fi
+
+          find "$WEBROOT" -type d -exec chmod 755 {} +
+          find "$WEBROOT" -type f -exec chmod 644 {} +
+          echo "--- webroot now ---"
+          find "$WEBROOT" -type f | sort
+
+      - name: Smoke test — local vhost
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: istumpf.dev' http://127.0.0.1/)
+          [ "$code" = "200" ] || { echo "::error::local / returned $code"; exit 1; }
+          curl -sf -H 'Host: istumpf.dev' http://127.0.0.1/healthz > /dev/null
+          echo "✓ local vhost serving"
+
+      - name: Smoke test — public HTTPS
+        run: |
+          set -euo pipefail
+          for url in https://istumpf.dev/ https://www.istumpf.dev/; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$url")
+            [ "$code" = "200" ] || { echo "::error::$url returned $code"; exit 1; }
+          done
+          curl -sf --max-time 15 https://istumpf.dev/assets/icons/icon.svg > /dev/null
+          echo "✓ public HTTPS serving"
+
+      - name: Assert the unfinished site is not exposed
+        if: steps.what.outputs.target == 'construction'
+        run: |
+          set -euo pipefail
+          for p in /assets/js/data.js /assets/css/style.css /assets/js/main.js; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "https://istumpf.dev$p")
+            [ "$code" = "404" ] || { echo "::error::$p is reachable ($code) — it must be 404"; exit 1; }
+          done
+          echo "✓ site assets are not public"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Deploy"
+            echo
+            echo "- Published: \`${{ steps.what.outputs.target }}\`"
+            echo "- Commit: \`${{ github.sha }}\`"
+            echo "- https://istumpf.dev"
+          } >> "$GITHUB_STEP_SUMMARY"
