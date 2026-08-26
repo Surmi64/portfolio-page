@@ -1,0 +1,15 @@
+services:
+  portfolio:
+    build: .
+    image: portfolio_page:latest
+    container_name: portfolio_page
+    restart: unless-stopped
+    # LAN + tailnet. Note: anyone on the LAN can reach this over plain HTTP.
+    # Tailnet-only variant:  - "<tailscale-ip>:4400:80"
+    ports:
+      - "4400:80"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
