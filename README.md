@@ -49,6 +49,7 @@ assets/css/style.css          all styling (tokens → primitives → sections �
 assets/js/data.js         ←   EDIT THIS: projects, principles, skills, timeline, contact
 assets/js/icons.js            local inline SVG icon set (27 icons, lucide-style)
 assets/js/main.js             rendering + interactions
+construction/index.html       standalone bilingual holding page (HU / EN)
 deploy/nginx/istumpf.dev.conf  the live public vhost, versioned
 Dockerfile · docker-compose.yml  for the internal tailnet copy
 ```
@@ -183,6 +184,17 @@ colours in `main.js` and the card accents in `data.js`.
 
 ## Deployment
 
+> [!NOTE]
+> **The public host currently serves `construction/index.html`, not the site.**
+> The content is being reworked, so the full page is deployed only to the
+> internal copy. The public directory holds that single file and nothing else —
+> the unfinished `assets/` were removed rather than left publicly fetchable.
+>
+> To put the site back:
+> ```sh
+> rsync -az --delete index.html assets <host>:/var/istumpf-dev/
+> ```
+
 Two targets, on purpose: a public one and an internal one.
 
 ```mermaid
@@ -316,6 +328,24 @@ A stale answer that **survives `resolvectl flush-caches`** is cached *upstream*,
 typically by the LAN router acting as DNS forwarder. Query it directly
 (`dig @<router-ip> istumpf.dev A`) and watch the TTL count down; it expires on
 its own, with nothing to fix.
+
+</details>
+
+<details>
+<summary><b>The holding page</b></summary>
+
+`construction/index.html` is deliberately **one self-contained file with no
+JavaScript**. The served CSP is `script-src 'self'`, so an inline `<script>`
+would be blocked — the HU/EN switch is therefore pure CSS: two visually hidden
+radio inputs and `:checked ~` sibling selectors.
+
+The radios use the sr-only *clip* pattern rather than `opacity: 0;
+pointer-events: none`, so they stay focusable and the native radio group still
+works from the keyboard (Tab in, arrow keys to switch). Styling the labels alone
+would have made the switch mouse-only.
+
+It also carries `<meta name="robots" content="noindex, nofollow">`, so the real
+site does not come back to a search index full of "under construction".
 
 </details>
 
