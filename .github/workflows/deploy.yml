@@ -81,13 +81,17 @@ jobs:
           rsync -a --delete assets/icons/ "$WEBROOT/assets/icons/"
 
           if [ "$target" = "site" ]; then
-            rsync -a index.html "$WEBROOT/index.html"
-            rsync -a --delete assets/css assets/js "$WEBROOT/assets/"
+            rsync -a index.html project.html "$WEBROOT/"
+            # --exclude keeps the authoring notes out of the webroot; the
+            # screenshots themselves are what the cards and detail pages load.
+            rsync -a --delete --exclude 'README.md' \
+              assets/css assets/js assets/img "$WEBROOT/assets/"
             echo "Published the full site."
           else
             rsync -a construction/index.html "$WEBROOT/index.html"
             # The holding page must not leave the unfinished site fetchable.
-            rm -rf "$WEBROOT/assets/css" "$WEBROOT/assets/js"
+            rm -f "$WEBROOT/project.html"
+            rm -rf "$WEBROOT/assets/css" "$WEBROOT/assets/js" "$WEBROOT/assets/img"
             echo "Published the holding page; site assets removed."
           fi
 
@@ -118,7 +122,7 @@ jobs:
         if: steps.what.outputs.target == 'construction'
         run: |
           set -euo pipefail
-          for p in /assets/js/data.js /assets/css/style.css /assets/js/main.js; do
+          for p in /assets/js/data.js /assets/css/style.css /assets/js/main.js /project.html; do
             code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "https://istumpf.dev$p")
             [ "$code" = "404" ] || { echo "::error::$p is reachable ($code) — it must be 404"; exit 1; }
           done

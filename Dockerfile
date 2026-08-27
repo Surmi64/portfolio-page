@@ -4,7 +4,7 @@ FROM nginx:1.30.2-alpine
 # Patch alpine packages (CVEs inherited from the base image)
 RUN apk upgrade --no-cache
 
-COPY index.html /usr/share/nginx/html/
+COPY index.html project.html /usr/share/nginx/html/
 COPY assets/    /usr/share/nginx/html/assets/
 
 RUN printf '\
