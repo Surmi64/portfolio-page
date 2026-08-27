@@ -257,6 +257,27 @@ body.has-cursor #cursor-glow{ opacity:1; }
   background:var(--accent); box-shadow:0 0 10px 1px rgba(var(--accent-rgb),.9);
 }
 
+.nav__end{ display:flex; align-items:center; gap:12px; }
+
+/* language switch -------------------------------------------------------- */
+.lang{
+  display:flex; align-items:center; gap:2px; padding:3px;
+  border:1px solid var(--stroke); border-radius:100px; background:var(--surface);
+}
+.lang__btn{
+  padding:5px 11px; border:0; border-radius:100px; background:transparent;
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.06em;
+  color:var(--text-3); cursor:pointer;
+  transition:color .3s, background .3s;
+}
+.lang__btn:hover{ color:var(--text-2); }
+.lang__btn.is-on{
+  color:#05070c; font-weight:600;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  box-shadow:0 0 16px -5px rgba(34,211,238,.9);
+}
+.lang__btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
+
 .nav__cta{ padding:10px 20px; font-size:.88rem; }
 .nav__burger{
   display:none; width:42px; height:42px; place-items:center;
@@ -481,9 +502,11 @@ body.has-cursor #cursor-glow{ opacity:1; }
 }
 .card{
   --accent:var(--cyan); --accent-rgb:34,211,238;
+  position:relative;
   display:flex; flex-direction:column; padding:0;
-  transform-style:preserve-3d;
-  transition:transform .18s ease-out, border-color .4s, box-shadow .5s, opacity .4s;
+  /* No transform on hover: the whole card is a link, and a card that shifts
+     under the pointer moves the target out from under the click. */
+  transition:border-color .4s, box-shadow .5s, opacity .4s;
 }
 .card[data-accent="violet"]{ --accent:var(--violet); --accent-rgb:168,85,247; }
 .card[data-accent="blue"]  { --accent:var(--blue);   --accent-rgb:79,125,255; }
@@ -501,12 +524,47 @@ body.has-cursor #cursor-glow{ opacity:1; }
 }
 .card:hover .card__spot{ opacity:1; }
 
+/* The stretched link. It covers the card but sits below the footer row, so
+   the external "open live" link still gets the click it is under. */
+.card__link{
+  position:absolute; inset:0; z-index:2; border-radius:inherit;
+}
+.card__link:focus-visible{
+  outline:2px solid var(--accent); outline-offset:3px;
+}
+.sr-only{
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0;
+}
+
 .card__visual{
-  position:relative; height:150px; overflow:hidden;
+  position:relative; height:170px; overflow:hidden;
   border-bottom:1px solid var(--stroke);
   background:
     radial-gradient(90% 130% at 18% 0%,rgba(var(--accent-rgb),.3),transparent 62%),
     linear-gradient(160deg,var(--bg-3),var(--bg-2));
+}
+
+/* screenshot cover -------------------------------------------------------- */
+.card__shot{
+  position:absolute; inset:0; z-index:0;
+  width:100%; height:100%; object-fit:cover; object-position:50% 0;
+  /* The shots are bright product pages dropped into a dark page; dimming and
+     desaturating them a little keeps the card readable and the row coherent,
+     and hover hands the real colours back. */
+  filter:saturate(.78) brightness(.62) contrast(1.04);
+  transform:scale(1.02);
+  transition:filter .5s var(--ease), transform .6s var(--ease);
+}
+.card:hover .card__shot{ filter:none; transform:scale(1.05); }
+
+.card__visual.has-shot::before{
+  /* readability scrim, painted over the shot but under the glyph and pills */
+  z-index:1;
+  background:
+    linear-gradient(to bottom,rgba(8,8,12,.72),rgba(8,8,12,.12) 55%,rgba(8,8,12,.55)),
+    linear-gradient(100deg,rgba(var(--accent-rgb),.14),transparent 60%);
+  mask-image:none; -webkit-mask-image:none;
 }
 .card__visual::before{      /* abstract note lines */
   content:""; position:absolute; inset:0;
@@ -523,7 +581,7 @@ body.has-cursor #cursor-glow{ opacity:1; }
 .card:hover .card__visual::after{ left:130%; }
 
 .card__glyph{
-  position:absolute; top:20px; left:22px;
+  position:absolute; z-index:2; top:20px; left:22px;
   display:grid; place-items:center; width:52px; height:52px;
   border-radius:16px; border:1px solid rgba(var(--accent-rgb),.34);
   background:rgba(11,11,15,.55); color:var(--accent);
@@ -532,10 +590,10 @@ body.has-cursor #cursor-glow{ opacity:1; }
   transition:transform .5s var(--ease);
 }
 .card__glyph svg{ width:24px; height:24px; }
-.card:hover .card__glyph{ transform:translateZ(30px) scale(1.06); }
+.card:hover .card__glyph{ transform:scale(1.06); }
 
 .card__meta{
-  position:absolute; top:20px; right:20px;
+  position:absolute; z-index:2; top:20px; right:20px;
   display:flex; align-items:center; gap:8px;
 }
 .pill{
@@ -587,7 +645,31 @@ body.has-cursor #cursor-glow{ opacity:1; }
 .card__stack{ display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; }
 .card:hover .card__stack .tag{ border-color:rgba(var(--accent-rgb),.28); color:var(--text-2); }
 
-.card__foot{ display:flex; align-items:center; gap:14px; margin-top:auto; padding-top:20px; }
+.card__foot{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  margin-top:auto; padding-top:20px; border-top:1px solid var(--stroke);
+}
+/* The "read the story" affordance is not itself a link — the stretched
+   .card__link behind it is — so it must not swallow the pointer. */
+.link-arrow--lead{ pointer-events:none; }
+.card:hover .link-arrow--lead{ gap:12px; }
+
+/* The one thing that must beat the stretched link: opening the live site. */
+.card__out{
+  position:relative; z-index:3;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 11px; border-radius:100px;
+  border:1px solid var(--stroke); background:rgba(255,255,255,.03);
+  font-size:.78rem; color:var(--text-2); white-space:nowrap;
+  transition:color .3s, border-color .3s, background .3s;
+}
+.card__out svg{ width:14px; height:14px; }
+.card__out:hover{
+  color:var(--accent); border-color:rgba(var(--accent-rgb),.45);
+  background:rgba(var(--accent-rgb),.1);
+}
+.card__out--muted{ color:var(--text-3); pointer-events:none; }
+
 .link-arrow{
   display:inline-flex; align-items:center; gap:7px;
   font-size:.88rem; font-weight:500; color:var(--accent);
@@ -747,16 +829,124 @@ body.has-cursor #cursor-glow{ opacity:1; }
 [data-reveal="scale"]{ transform:scale(.96); }
 [data-reveal].is-in{ opacity:1; transform:none; }
 
+/* ------------------------------------------------ 12b. project detail */
+/* project.html renders into .detail; the accent is inherited from the
+   project the same way the cards do it, so a detail page reads as the
+   same object the visitor clicked. */
+.detail{ padding-top:calc(var(--nav-h) + 34px); padding-bottom:20px; }
+.detail__body{ --accent:var(--cyan); --accent-rgb:34,211,238; }
+.detail__body[data-accent="violet"]{ --accent:var(--violet); --accent-rgb:168,85,247; }
+.detail__body[data-accent="blue"]  { --accent:var(--blue);   --accent-rgb:79,125,255; }
+.detail__body[data-accent="amber"] { --accent:var(--amber);  --accent-rgb:245,177,61; }
+
+.detail__back{
+  display:inline-flex; align-items:center; gap:6px; margin-bottom:26px;
+  font-size:.86rem; color:var(--text-3); transition:color .3s, gap .3s var(--ease);
+}
+.detail__back svg{ width:16px; height:16px; }
+.detail__back:hover{ color:var(--accent); gap:10px; }
+
+.detail__head{ display:flex; align-items:flex-start; gap:20px; }
+.detail__glyph{
+  flex:none; display:grid; place-items:center; width:58px; height:58px;
+  border-radius:18px; border:1px solid rgba(var(--accent-rgb),.34);
+  background:rgba(11,11,15,.55); color:var(--accent);
+  box-shadow:0 0 30px -8px rgba(var(--accent-rgb),.85);
+}
+.detail__glyph svg{ width:27px; height:27px; }
+
+.detail__pills{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.detail__title{ font-size:clamp(1.9rem,4.4vw,2.9rem); }
+.detail__sub{ margin-top:8px; font-size:1.02rem; color:var(--accent); }
+
+.detail__actions{
+  display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:26px;
+}
+.btn.is-muted{ color:var(--text-3); pointer-events:none; }
+.detail__repo{
+  display:inline-flex; align-items:center; gap:7px;
+  font-family:var(--mono); font-size:.76rem; color:var(--text-3);
+}
+.detail__repo svg{ width:14px; height:14px; }
+
+.detail__cover{
+  margin:38px 0 6px; padding:0; overflow:hidden;
+  border-radius:var(--r-lg);
+}
+.detail__cover img{ width:100%; height:auto; }
+
+.detail__grid{
+  display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:38px;
+  margin-top:44px;
+}
+.detail__section{ margin-bottom:34px; }
+.detail__h2{
+  margin-bottom:14px; font-size:1.28rem;
+}
+.detail__h3{ margin-bottom:10px; font-size:1.06rem; }
+.detail__lead{ font-size:1.04rem; color:var(--text-2); }
+.detail__p{ color:var(--text-2); }
+.detail__p--muted{ color:var(--text-3); font-size:.92rem; }
+
+.detail__hl{ display:grid; gap:12px; }
+.detail__hl li{
+  display:flex; align-items:flex-start; gap:11px;
+  font-size:.94rem; color:var(--text-2);
+}
+.detail__hl svg{ flex:none; width:17px; height:17px; margin-top:4px; color:var(--accent); }
+
+.shots{ display:grid; gap:20px; }
+.shot{ padding:0; overflow:hidden; border-radius:var(--r-md); }
+.shot img{ width:100%; height:auto; border-bottom:1px solid var(--stroke); }
+.shot figcaption{ padding:12px 16px; font-size:.82rem; color:var(--text-3); }
+
+.detail__aside{ display:grid; gap:18px; align-content:start; position:sticky; top:calc(var(--nav-h) + 24px); }
+.detail__box{ padding:20px 20px 22px; }
+.detail__boxTitle{
+  margin-bottom:14px; font-family:var(--mono); font-size:.7rem;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--text-3);
+}
+.detail__metrics{ margin-top:0; padding-top:0; border-top:0; }
+
+.detail__facts{ margin:0; display:grid; gap:12px; }
+.detail__facts dt{ font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--text-3); }
+.detail__facts dd{ margin:2px 0 0; font-size:.9rem; color:var(--text-2); }
+
+.detail__nav{
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  margin-top:24px; padding-top:30px; border-top:1px solid var(--stroke);
+}
+.detail__navItem{
+  padding:18px 20px; border-radius:var(--r-md);
+  border:1px solid var(--stroke); background:var(--surface);
+  transition:border-color .35s, background .35s, transform .35s var(--ease);
+}
+.detail__navItem span{ display:block; font-size:.72rem; color:var(--text-3); }
+.detail__navItem b{ display:block; margin-top:5px; font-size:1rem; font-weight:600; }
+.detail__navItem--next{ text-align:right; }
+.detail__navItem:hover{
+  border-color:rgba(var(--accent-rgb),.4); background:var(--surface-2);
+}
+.detail__navItem--prev:hover{ transform:translateX(-4px); }
+.detail__navItem--next:hover{ transform:translateX(4px); }
+
+.detail__missing{ padding:80px 0 120px; text-align:center; }
+.detail__missing .section-lead{ margin:14px auto 28px; }
+
 /* ------------------------------------------------------- 13.responsive */
 @media (max-width:1020px){
   .hero__grid{ grid-template-columns:1fr; }
   .hero__panel{ order:-1; max-width:520px; }
   .contact__grid{ grid-template-columns:1fr; }
+  .detail__grid{ grid-template-columns:1fr; }
+  .detail__aside{ position:static; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
 }
 @media (max-width:860px){
   :root{ --nav-h:64px; }
   .nav__links,.nav__cta{ display:none; }
   .nav__burger{ display:grid; }
+  /* project.html has no burger — the language switch has to stay reachable */
+  .is-detail .nav__end{ gap:8px; }
   .hero{ min-height:auto; padding-bottom:100px; }
   .hero__stats{ grid-template-columns:repeat(2,1fr); gap:22px 16px; margin-top:42px; }
   .scroll-hint{ display:none; }
@@ -770,6 +960,9 @@ body.has-cursor #cursor-glow{ opacity:1; }
   #cursor-glow{ display:none; }
   .timeline{ padding-left:28px; }
   .tl__node{ left:-25px; }
+  .detail__head{ gap:14px; }
+  .detail__nav{ grid-template-columns:1fr; }
+  .detail__navItem--next{ text-align:left; }
 }
 
 @media (prefers-reduced-motion:reduce){

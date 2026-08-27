@@ -5,24 +5,21 @@
   "use strict";
 
   var D = window.PORTFOLIO;
-  var $  = function (s, r) { return (r || document).querySelector(s); };
-  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var $ = window.UI.$, $$ = window.UI.$$;
+  var esc = window.UI.esc, e = window.UI.e, t = window.UI.t;
+  var s = window.UI.s, ico = window.UI.ico, tags = window.UI.tags;
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function esc(t) {
-    return String(t).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-  function ico(name, cls) {
-    return window.ICONS.svg(name, cls);
-  }
-  /* single source of truth for "how many are live" */
+  /* single source of truth for "how many are live". `status` is translated,
+     so it cannot be compared against a literal — `real` plus a live URL is
+     the durable test. */
   function derivedLive() {
-    return D.projects.filter(function (x) { return x.status === "Live"; }).length;
+    return D.projects.filter(function (x) { return x.live !== false && x.real; }).length;
   }
-  function tags(arr) {
-    return arr.map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("");
+
+  /* where a card and its "read the story" link point */
+  function detailHref(p) {
+    return "project.html?p=" + encodeURIComponent(p.slug);
   }
 
   /* ===================================================== 1. HERO / PERSON */
@@ -40,23 +37,24 @@
       '<span style="color:var(--cyan)">' + esc(p.domain.slice(dot)) + "</span>";
 
     $("#hero-name").innerHTML =
-      "Hi, I'm " + esc(p.first) + "<em class=\"grad-text\">" + esc(p.tagline) + ".</em>";
+      s("hero.greet") + esc(p.first) + s("hero.greetEnd") +
+      '<em class="grad-text">' + e(p.tagline) + ".</em>";
     var role = $("#hero-role");
-    role.textContent = p.role;
-    role.setAttribute("data-text", p.role);
-    $("#hero-lead").textContent = p.lead;
-    $("#hero-availability").textContent = p.availability;
+    role.textContent = t(p.role);
+    role.setAttribute("data-text", t(p.role));
+    $("#hero-lead").textContent = t(p.lead);
+    $("#hero-availability").textContent = t(p.availability);
 
     /* a stat can be derived from the project list, so the two cannot drift */
     var derived = {
       live: derivedLive(),
     };
 
-    $("#hero-stats").innerHTML = p.stats.map(function (s, i) {
-      var val = s.auto ? derived[s.auto] : s.value;
+    $("#hero-stats").innerHTML = p.stats.map(function (st, i) {
+      var val = st.auto ? derived[st.auto] : st.value;
       return '<div class="stat" data-reveal style="--d:' + (420 + i * 90) + 'ms">' +
-             '<div class="stat__v" data-count="' + val + '" data-suffix="' + esc(s.suffix || "") + '">0</div>' +
-             '<div class="stat__k">' + esc(s.label) + "</div></div>";
+             '<div class="stat__v" data-count="' + val + '" data-suffix="' + esc(st.suffix || "") + '">0</div>' +
+             '<div class="stat__k">' + e(st.label) + "</div></div>";
     }).join("");
 
     /* terminal panel — generated from the real project stacks */
@@ -69,7 +67,7 @@
     $("#terminal-body").innerHTML =
       '<div><span class="c">// ' + esc(p.domain) + ' — stack.json</span></div>' +
       '<div>{</div>' +
-      '<div>&nbsp;&nbsp;<span class="k">"role"</span>: <span class="s">"' + esc(p.role) + '"</span>,</div>' +
+      '<div>&nbsp;&nbsp;<span class="k">"role"</span>: <span class="s">"' + e(p.role) + '"</span>,</div>' +
       '<div>&nbsp;&nbsp;<span class="k">"live"</span>: <span class="n">' + derivedLive() + '</span>,</div>' +
       '<div>&nbsp;&nbsp;<span class="k">"core"</span>: [</div>' +
       realStack.slice(0, 6).map(function (s, i, a) {
@@ -88,32 +86,34 @@
     el.innerHTML = D.principles.map(function (pr, i) {
       return '<article class="glass principle" data-reveal style="--d:' + i * 90 + 'ms">' +
         '<div class="principle__icon">' + ico(pr.icon) + "</div>" +
-        '<h3 class="principle__title">' + esc(pr.title) + "</h3>" +
-        '<p class="principle__text">' + esc(pr.text) + "</p>" +
+        '<h3 class="principle__title">' + e(pr.title) + "</h3>" +
+        '<p class="principle__text">' + e(pr.text) + "</p>" +
       "</article>";
     }).join("");
   }
 
   /* ============================================================ 3. SKILLS */
   function renderSkills() {
-    $("#skills").innerHTML = D.skills.map(function (s, i) {
+    $("#skills").innerHTML = D.skills.map(function (sk, i) {
       return '<article class="glass skill" data-reveal="scale" style="--d:' + i * 80 + 'ms">' +
         '<div class="skill__top">' +
-          '<div class="skill__icon">' + ico(s.icon) + "</div>" +
-          '<h3 class="skill__name">' + esc(s.name) + "</h3>" +
-          '<span class="skill__pct">' + s.level + "%</span>" +
+          '<div class="skill__icon">' + ico(sk.icon) + "</div>" +
+          '<h3 class="skill__name">' + e(sk.name) + "</h3>" +
+          '<span class="skill__pct">' + sk.level + "%</span>" +
         "</div>" +
-        '<div class="bar"><i data-level="' + s.level + '"></i></div>' +
-        '<ul class="skill__items">' + tags(s.items) + "</ul>" +
+        '<div class="bar"><i data-level="' + sk.level + '"></i></div>' +
+        '<ul class="skill__items">' + tags(sk.items) + "</ul>" +
       "</article>";
     }).join("");
   }
 
   /* ========================================================== 4. PROJECTS */
   function renderProjects() {
-    $("#filters").innerHTML = D.filters.map(function (f, i) {
-      return '<button class="chip' + (i === 0 ? " is-active" : "") +
-             '" data-filter="' + esc(f) + '" type="button">' + esc(f) + "</button>";
+    var active = filterState;
+
+    $("#filters").innerHTML = D.filters.map(function (f) {
+      return '<button class="chip' + (f.key === active ? " is-active" : "") +
+             '" data-filter="' + esc(f.key) + '" type="button">' + e(f.label) + "</button>";
     }).join("");
 
     $("#projects").innerHTML = D.projects.map(function (p, i) {
@@ -122,90 +122,95 @@
       return '<article class="glass card" data-accent="' + esc(p.accent) + '" data-cats="' + esc(cats) +
              '" data-reveal style="--d:' + (i % 3) * 110 + 'ms">' +
         '<span class="card__spot"></span>' +
-        '<div class="card__visual">' +
-          '<span class="card__ring"></span>' +
+
+        /* The whole card is the link to the story. It sits under the content
+           so that the external link and the tags stay selectable, and it
+           carries the accessible name so screen readers announce one link
+           rather than a bare region. */
+        '<a class="card__link" href="' + esc(detailHref(p)) + '">' +
+          '<span class="sr-only">' + e(p.title) + " — " + s("work.details") + "</span></a>" +
+
+        '<div class="card__visual' + (p.cover ? " has-shot" : "") + '">' +
+          (p.cover
+            ? '<img class="card__shot" src="' + esc(p.cover) + '" alt="" loading="lazy" ' +
+              'width="1280" height="720">'
+            : '<span class="card__ring"></span>') +
           '<div class="card__glyph">' + ico(p.icon) + "</div>" +
           '<div class="card__meta">' +
-            '<span class="pill">' + esc(p.status) + "</span>" +
-            '<span class="pill pill--muted">' + esc(p.year) + "</span>" +
+            '<span class="pill">' + e(p.status) + "</span>" +
+            '<span class="pill pill--muted">' + e(p.year) + "</span>" +
           "</div>" +
         "</div>" +
+
         '<div class="card__body">' +
-          '<h3 class="card__title">' + esc(p.title) + "</h3>" +
-          '<div class="card__sub">' + esc(p.subtitle) + "</div>" +
-          '<p class="card__desc">' + esc(p.description) + "</p>" +
+          '<h3 class="card__title">' + e(p.title) + "</h3>" +
+          '<div class="card__sub">' + e(p.subtitle) + "</div>" +
+          '<p class="card__desc">' + e(p.description) + "</p>" +
           '<ul class="card__hl">' + p.highlights.map(function (h) {
-            return "<li>" + esc(h) + "</li>";
+            return "<li>" + e(h) + "</li>";
           }).join("") + "</ul>" +
           '<div class="card__metrics">' + p.metrics.map(function (m) {
-            return '<div class="metric"><b>' + esc(m.v) + "</b><span>" + esc(m.k) + "</span></div>";
+            return '<div class="metric"><b>' + e(m.v) + "</b><span>" + e(m.k) + "</span></div>";
           }).join("") + "</div>" +
           '<div class="card__stack">' + tags(p.stack) + "</div>" +
           '<div class="card__foot">' +
+            '<span class="link-arrow link-arrow--lead">' +
+              s("work.details") + " " + ico("arrow-right") + "</span>" +
             (hasLink
-              ? '<a class="link-arrow" href="' + esc(p.url) + '" target="_blank" rel="noopener">' +
-                "Open " + ico("arrow-up-right") + "</a>"
-              : '<span class="link-arrow link-arrow--muted">' +
-                esc(p.linkLabel || "Coming soon") + " " + ico("clock") + "</span>") +
-            (p.repo ? '<span class="card__repo">' + esc(p.repo) + "</span>" : "") +
+              ? '<a class="card__out" href="' + esc(p.url) + '" target="_blank" rel="noopener" ' +
+                'title="' + s("work.open") + '">' + s("work.open") + " " + ico("arrow-up-right") + "</a>"
+              : '<span class="card__out card__out--muted">' +
+                e(p.linkLabel || window.STRINGS["work.soon"]) + " " + ico("clock") + "</span>") +
           "</div>" +
         "</div>" +
       "</article>";
     }).join("");
 
-    /* --- category filter --- */
+    applyFilter(active);
+  }
+
+  /* --- category filter ------------------------------------------------- */
+  /* Kept outside renderProjects so a language switch can re-render the cards
+     without dropping the chip the visitor had chosen. */
+  var filterState = "all";
+
+  function applyFilter(key) {
+    filterState = key;
     var cards = $$(".card", $("#projects"));
-    $("#filters").addEventListener("click", function (e) {
-      var chip = e.target.closest(".chip");
+    cards.forEach(function (c) {
+      var show = key === "all" || c.dataset.cats.split(",").indexOf(key) > -1;
+      c.classList.toggle("is-hidden", !show);
+      if (show) {                       /* re-trigger the reveal */
+        c.classList.remove("is-in");
+        void c.offsetWidth;
+        c.classList.add("is-in");
+      }
+    });
+    $("#project-count").textContent = cards.filter(function (c) {
+      return !c.classList.contains("is-hidden");
+    }).length;
+  }
+
+  function wireFilters() {
+    $("#filters").addEventListener("click", function (ev) {
+      var chip = ev.target.closest(".chip");
       if (!chip) return;
       $$(".chip", this).forEach(function (c) { c.classList.remove("is-active"); });
       chip.classList.add("is-active");
-
-      var f = chip.dataset.filter;
-      cards.forEach(function (c) {
-        var show = f === D.filters[0] || c.dataset.cats.split(",").indexOf(f) > -1;
-        c.classList.toggle("is-hidden", !show);
-        if (show) {                       /* re-trigger the reveal */
-          c.classList.remove("is-in");
-          void c.offsetWidth;
-          c.classList.add("is-in");
-        }
-      });
-      $("#project-count").textContent = cards.filter(function (c) {
-        return !c.classList.contains("is-hidden");
-      }).length;
+      applyFilter(chip.dataset.filter);
     });
-    $("#project-count").textContent = cards.length;
-
-    if (!reduced) attachTilt(cards);
   }
 
-  /* 3D tilt + spotlight ---------------------------------------------------- */
-  function attachTilt(cards) {
-    cards.forEach(function (card) {
-      var raf = null, tx = 0, ty = 0;
-
-      function apply() {
-        raf = null;
-        card.style.transform =
-          "perspective(900px) rotateX(" + ty + "deg) rotateY(" + tx + "deg) translateY(-6px)";
-      }
-
-      card.addEventListener("pointermove", function (e) {
+  /* Spotlight only. The cards used to tilt in 3D under the pointer, which
+     moved the links out from under the cursor mid-click — now nothing moves
+     but the light. */
+  function attachSpotlight() {
+    $$(".card", $("#projects")).forEach(function (card) {
+      card.addEventListener("pointermove", function (ev) {
         var r = card.getBoundingClientRect();
-        var px = (e.clientX - r.left) / r.width;
-        var py = (e.clientY - r.top) / r.height;
-        tx = (px - 0.5) * 9;
-        ty = (0.5 - py) * 9;
-        card.style.setProperty("--mx", px * 100 + "%");
-        card.style.setProperty("--my", py * 100 + "%");
-        if (!raf) raf = requestAnimationFrame(apply);
-      });
-
-      card.addEventListener("pointerleave", function () {
-        if (raf) { cancelAnimationFrame(raf); raf = null; }
-        card.style.transform = "";
-      });
+        card.style.setProperty("--mx", ((ev.clientX - r.left) / r.width) * 100 + "%");
+        card.style.setProperty("--my", ((ev.clientY - r.top) / r.height) * 100 + "%");
+      }, { passive: true });
     });
   }
 
@@ -213,15 +218,15 @@
   function renderTimeline() {
     $("#timeline").innerHTML =
       '<span class="timeline__fill" id="tl-fill"></span>' +
-      D.timeline.map(function (t, i) {
+      D.timeline.map(function (tl, i) {
         return '<div class="tl" data-reveal="left" style="--d:' + i * 100 + 'ms">' +
           '<span class="tl__node"></span>' +
-          '<div class="tl__period">' + esc(t.period) + "</div>" +
+          '<div class="tl__period">' + e(tl.period) + "</div>" +
           '<div class="glass tl__card">' +
-            '<h3 class="tl__title">' + esc(t.title) + "</h3>" +
-            '<div class="tl__org">' + esc(t.org) + "</div>" +
-            '<p class="tl__text">' + esc(t.text) + "</p>" +
-            '<div class="tl__tags">' + tags(t.tags) + "</div>" +
+            '<h3 class="tl__title">' + e(tl.title) + "</h3>" +
+            '<div class="tl__org">' + e(tl.org) + "</div>" +
+            '<p class="tl__text">' + e(tl.text) + "</p>" +
+            '<div class="tl__tags">' + tags(tl.tags) + "</div>" +
           "</div>" +
         "</div>";
       }).join("");
@@ -231,10 +236,10 @@
   function renderContact() {
     var p = D.person;
     $("#info-rows").innerHTML = [
-      { i: "mail",      k: "Email",        v: p.email, href: "mailto:" + p.email },
-      { i: "map-pin",   k: "Location",     v: p.location },
-      { i: "briefcase", k: "Availability", v: p.availability },
-      { i: "clock",     k: "Response",     v: "usually within 24 hours" },
+      { i: "mail",      k: s("info.email"),        v: p.email, href: "mailto:" + p.email },
+      { i: "map-pin",   k: s("info.location"),     v: t(p.location) },
+      { i: "briefcase", k: s("info.availability"), v: t(p.availability) },
+      { i: "clock",     k: s("info.response"),     v: s("info.responseV") },
     ].map(function (r) {
       var val = r.href ? '<a href="' + esc(r.href) + '">' + esc(r.v) + "</a>" : esc(r.v);
       return '<div class="info__row">' +
@@ -243,9 +248,9 @@
       "</div>";
     }).join("");
 
-    $("#socials").innerHTML = p.socials.map(function (s) {
-      return '<a class="social" href="' + esc(s.href) + '" target="_blank" rel="noopener" ' +
-             'aria-label="' + esc(s.label) + '" title="' + esc(s.label) + '">' + ico(s.icon) + "</a>";
+    $("#socials").innerHTML = p.socials.map(function (so) {
+      return '<a class="social" href="' + esc(so.href) + '" target="_blank" rel="noopener" ' +
+             'aria-label="' + esc(so.label) + '" title="' + esc(so.label) + '">' + ico(so.icon) + "</a>";
     }).join("");
 
     $("#footer-name").textContent = p.name;
@@ -267,15 +272,15 @@
       var ok = true;
       var name = $("#f-name"), mail = $("#f-mail"), msg = $("#f-msg");
 
-      if (!name.value.trim()) { setErr(name.closest(".field"), "Please enter your name."); ok = false; }
+      if (!name.value.trim()) { setErr(name.closest(".field"), s("form.errName")); ok = false; }
       else setErr(name.closest(".field"), "");
 
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail.value.trim())) {
-        setErr(mail.closest(".field"), "That does not look like an email address."); ok = false;
+        setErr(mail.closest(".field"), s("form.errMail")); ok = false;
       } else setErr(mail.closest(".field"), "");
 
       if (msg.value.trim().length < 10) {
-        setErr(msg.closest(".field"), "A little more detail, please (10+ characters)."); ok = false;
+        setErr(msg.closest(".field"), s("form.errMsg")); ok = false;
       } else setErr(msg.closest(".field"), "");
 
       if (!ok) return;
@@ -561,15 +566,11 @@
     frame();
   }
 
-  /* replace <span data-icon="..."> in the markup with inline SVG */
-  function hydrateStaticIcons() {
-    $$("[data-icon]").forEach(function (el) {
-      el.innerHTML = ico(el.getAttribute("data-icon"));
-    });
-  }
-
   /* ================================================================ BOOT */
-  function boot() {
+
+  /* Everything the language switch has to redo. The scroll reveal is
+     re-armed afterwards because the rendered nodes are new ones. */
+  function renderAll() {
     renderHero();
     renderPrinciples();
     renderSkills();
@@ -577,13 +578,29 @@
     renderTimeline();
     renderContact();
 
-    hydrateStaticIcons();
+    window.UI.hydrateStrings();
+    window.UI.hydrateIcons();
+
+    if (!reduced) attachSpotlight();
+  }
+
+  function boot() {
+    document.documentElement.lang = window.I18N.lang();
+    window.UI.buildLangSwitch($("#lang-switch"));
+
+    renderAll();
+    wireFilters();
 
     initReveal();
     initNav();
     initCursor();
     initCanvas();
     wireForm();
+
+    window.addEventListener("langchange", function () {
+      renderAll();
+      initReveal();
+    });
   }
 
   if (document.readyState === "loading") {

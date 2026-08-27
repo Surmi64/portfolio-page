@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <title>Imre Stumpf — DevOps Engineer</title>
-<meta name="description" content="DevOps Engineer. I build side projects that solve someone's real problem — an AI tutor grounded in textbooks, a multilingual storefront, a trilingual guesthouse site.">
+<meta name="description" content="DevOps Engineer. I build side projects that solve someone's real problem — an AI tutor grounded in textbooks, a winery's own management system, a trilingual guesthouse site.">
 <meta name="theme-color" content="#0b0b0f">
 <link rel="canonical" href="https://istumpf.dev/">
 
@@ -35,33 +35,37 @@
 <!-- ================================= nav ================================ -->
 <header class="nav" id="nav">
   <div class="wrap nav__inner">
-    <a class="brand" href="#top" aria-label="Back to top">
+    <a class="brand" href="#top" data-i18n-aria="nav.top">
       <span class="brand__mark"><span id="brand-initials">IS</span></span>
       <span id="brand-name">istumpf<span style="color:var(--cyan)">.dev</span></span>
     </a>
 
     <nav class="nav__links" aria-label="Primary">
-      <a class="nav__link" data-nav href="#about">About</a>
-      <a class="nav__link" data-nav href="#work">Work</a>
-      <a class="nav__link" data-nav href="#path">Path</a>
-      <a class="nav__link" data-nav href="#contact">Contact</a>
+      <a class="nav__link" data-nav href="#about"   data-i18n="nav.about">About</a>
+      <a class="nav__link" data-nav href="#work"    data-i18n="nav.work">Work</a>
+      <a class="nav__link" data-nav href="#path"    data-i18n="nav.path">Path</a>
+      <a class="nav__link" data-nav href="#contact" data-i18n="nav.contact">Contact</a>
     </nav>
 
-    <a class="btn btn--solid nav__cta" href="#contact">
-      Get in touch <span data-icon="arrow-right"></span>
-    </a>
+    <div class="nav__end">
+      <div class="lang" id="lang-switch" role="group" data-i18n-aria="nav.lang"></div>
 
-    <button class="nav__burger" id="nav-burger" type="button" aria-label="Menu" aria-expanded="false">
-      <span data-icon="menu"></span>
-    </button>
+      <a class="btn btn--solid nav__cta" href="#contact">
+        <span data-i18n="nav.cta">Get in touch</span> <span data-icon="arrow-right"></span>
+      </a>
+
+      <button class="nav__burger" id="nav-burger" type="button" data-i18n-aria="nav.menu" aria-expanded="false">
+        <span data-icon="menu"></span>
+      </button>
+    </div>
   </div>
 </header>
 
 <div class="nav__mobile" id="nav-mobile">
-  <a href="#about">About</a>
-  <a href="#work">Work</a>
-  <a href="#path">Path</a>
-  <a href="#contact">Contact</a>
+  <a href="#about"   data-i18n="nav.about">About</a>
+  <a href="#work"    data-i18n="nav.work">Work</a>
+  <a href="#path"    data-i18n="nav.path">Path</a>
+  <a href="#contact" data-i18n="nav.contact">Contact</a>
 </div>
 
 <main class="page" id="top">
@@ -84,10 +88,10 @@
 
         <div class="hero__actions" data-reveal style="--d:340ms">
           <a class="btn btn--solid" href="#work">
-            See my work <span data-icon="arrow-right"></span>
+            <span data-i18n="hero.seeWork">See my work</span> <span data-icon="arrow-right"></span>
           </a>
           <a class="btn btn--ghost" href="#contact">
-            <span data-icon="send"></span> Contact
+            <span data-icon="send"></span> <span data-i18n="hero.contact">Contact</span>
           </a>
         </div>
 
@@ -110,7 +114,7 @@
     </div>
 
     <div class="scroll-hint" aria-hidden="true">
-      <span>scroll</span>
+      <span data-i18n="hero.scroll">scroll</span>
       <i></i>
     </div>
   </section>
@@ -119,20 +123,14 @@
   <section class="section" id="about">
     <div class="wrap">
       <header class="section-head" data-reveal>
-        <div class="eyebrow">01 — About</div>
-        <h2 class="h2">Ops by day, <span class="grad-text">builder by night</span></h2>
-        <p class="section-lead">
-          I keep other people's systems running for a living, which taught me
-          that the interesting problems live at the seams — between the code
-          and the thing it runs on. Side projects are where I get to own both
-          ends, and I choose them by a simple rule: someone other than me has
-          to want the result.
-        </p>
+        <div class="eyebrow" data-i18n="about.eyebrow">01 — About</div>
+        <h2 class="h2" data-i18n-html="about.title">Ops by day, <span class="grad-text">builder by night</span></h2>
+        <p class="section-lead" data-i18n="about.lead"></p>
       </header>
 
       <div class="principles" id="principles"></div>
 
-      <h3 class="sub-h" data-reveal>What I work with</h3>
+      <h3 class="sub-h" data-reveal data-i18n="about.skills">What I work with</h3>
       <div class="skills" id="skills"></div>
     </div>
   </section>
@@ -141,15 +139,14 @@
   <section class="section" id="work">
     <div class="wrap">
       <header class="section-head" data-reveal>
-        <div class="eyebrow">02 — Work</div>
-        <h2 class="h2">Things I've <span class="grad-text">shipped</span></h2>
+        <div class="eyebrow" data-i18n="work.eyebrow">02 — Work</div>
+        <h2 class="h2" data-i18n-html="work.title">Things I've <span class="grad-text">shipped</span></h2>
         <p class="section-lead">
-          Live products and internal tools. Showing <b id="project-count">0</b>
-          right now — filter by category.
+          <span data-i18n="work.leadBefore"></span><b id="project-count">0</b><span data-i18n="work.leadAfter"></span>
         </p>
       </header>
 
-      <div class="filters" id="filters" role="group" aria-label="Filter projects"></div>
+      <div class="filters" id="filters" role="group" data-i18n-aria="work.filterLabel"></div>
       <div class="projects" id="projects"></div>
     </div>
   </section>
@@ -158,8 +155,8 @@
   <section class="section" id="path">
     <div class="wrap">
       <header class="section-head" data-reveal>
-        <div class="eyebrow">03 — Path</div>
-        <h2 class="h2">How I got <span class="grad-text">here</span></h2>
+        <div class="eyebrow" data-i18n="path.eyebrow">03 — Path</div>
+        <h2 class="h2" data-i18n-html="path.title">How I got <span class="grad-text">here</span></h2>
       </header>
 
       <div class="timeline" id="timeline"></div>
@@ -170,54 +167,49 @@
   <section class="section" id="contact">
     <div class="wrap">
       <header class="section-head" data-reveal>
-        <div class="eyebrow">04 — Contact</div>
-        <h2 class="h2">Let's build <span class="grad-text">something</span></h2>
-        <p class="section-lead">
-          A new product, an AI integration, or an existing system that needs
-          pipelines and monitoring it never got. Write a few lines and I'll
-          get back to you.
-        </p>
+        <div class="eyebrow" data-i18n="contact.eyebrow">04 — Contact</div>
+        <h2 class="h2" data-i18n-html="contact.title">Let's build <span class="grad-text">something</span></h2>
+        <p class="section-lead" data-i18n="contact.lead"></p>
       </header>
 
       <div class="contact__grid">
 
         <form class="glass form" id="contact-form" novalidate data-reveal="left">
           <div class="field">
-            <label for="f-name">Name</label>
-            <input id="f-name" name="name" type="text" placeholder="What should I call you?" autocomplete="name">
+            <label for="f-name" data-i18n="form.name">Name</label>
+            <input id="f-name" name="name" type="text" data-i18n-ph="form.namePh" autocomplete="name">
             <div class="field__msg"></div>
           </div>
 
           <div class="field">
-            <label for="f-mail">Email</label>
-            <input id="f-mail" name="email" type="email" placeholder="you@example.com" autocomplete="email">
+            <label for="f-mail" data-i18n="form.email">Email</label>
+            <input id="f-mail" name="email" type="email" data-i18n-ph="form.emailPh" autocomplete="email">
             <div class="field__msg"></div>
           </div>
 
           <div class="field">
-            <label for="f-msg">What's it about?</label>
-            <textarea id="f-msg" name="message" placeholder="A few lines about the project, the timeline and the budget…"></textarea>
+            <label for="f-msg" data-i18n="form.msg">What's it about?</label>
+            <textarea id="f-msg" name="message" data-i18n-ph="form.msgPh"></textarea>
             <div class="field__msg"></div>
           </div>
 
           <div class="form__foot">
             <button class="btn btn--solid" id="f-submit" type="submit">
-              Send message <span data-icon="send"></span>
+              <span data-i18n="form.send">Send message</span> <span data-icon="send"></span>
             </button>
-            <span class="form__note">No backend yet — submitting validates locally.</span>
+            <span class="form__note" data-i18n="form.note"></span>
           </div>
 
           <div class="form__ok" id="form-ok">
             <span data-icon="check-circle"></span>
-            Thanks — the form validated. Wire your own endpoint into
-            <code>wireForm()</code> in <code>main.js</code>.
+            <span data-i18n="form.ok"></span>
           </div>
         </form>
 
         <aside class="aside" data-reveal="right" style="--d:120ms">
           <div class="glass info" id="info-rows"></div>
           <div class="glass info">
-            <div class="info__k" style="margin-bottom:14px">Elsewhere</div>
+            <div class="info__k" style="margin-bottom:14px" data-i18n="info.elsewhere">Elsewhere</div>
             <div class="socials" id="socials"></div>
           </div>
         </aside>
@@ -230,17 +222,20 @@
   <footer class="foot">
     <div class="wrap foot__inner">
       <span>© <span id="footer-year">2026</span> <span id="footer-name">Imre Stumpf</span></span>
-      <span>Hand-written HTML / CSS / JS · zero dependencies</span>
+      <span data-i18n="foot.built"></span>
     </div>
   </footer>
 
 </main>
 
-<button class="to-top" id="to-top" type="button" aria-label="Back to top">
+<button class="to-top" id="to-top" type="button" data-i18n-aria="nav.top">
   <span data-icon="arrow-up"></span>
 </button>
 
 <script src="assets/js/icons.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/strings.js"></script>
+<script src="assets/js/ui.js"></script>
 <script src="assets/js/data.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
